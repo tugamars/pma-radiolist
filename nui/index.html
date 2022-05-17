@@ -1,0 +1,111 @@
+<html>
+
+<head>
+	<title></title>
+	
+	<style>
+		.radio-list {
+			list-style-type: none;
+			font-family: "Arial Black";
+			font-size: 11px;
+			position:absolute;
+			right:5px;
+			top: 10px;
+			text-align:right;
+			margin: 0;
+		}
+		
+		.radio-list > li {
+			color: rgba(255,255,255,0.6);
+		}
+		
+		.radio-list > li.active {
+			color: rgba(235, 219, 52,1);
+		}
+		
+		
+		h3 {
+			font-family:'Arial Black';
+			text-transform: uppercase;
+			font-size: 10px;
+			right: 5px;
+			position:absolute;
+			margin:0;
+			color:#FFF;
+		}
+		
+		body {
+			margin:0;
+		}
+		
+		#radio-stuff {
+			display: none;
+		}
+	</style>
+</head>
+
+<body>
+		<div class="radio-stuff" id="radio-stuff">
+			<h3>Comms List</h3>
+			<ul class="radio-list" id="radio-list">
+			</ul>
+		</div>
+		
+		
+		<script type="text/javascript">
+		var identifiers={};
+		
+		window.addEventListener('message', (event) => {
+			if (event.data.type === 'addToRadio') {
+				addToRadio(event.data.playerData);
+			} else if(event.data.type === 'removeFromRadio') {
+				removeFromRadio(event.data.plyId);
+			} else if(event.data.type === 'leaveRadio') {
+				cleanRadio();
+			} else if(event.data.type === 'joinRadio') {
+				joinRadio(event.data.radioData);
+			} else if(event.data.type === 'setTalkingOnRadio'){
+				setTalkingOnRadio(event.data.plyId, event.data.talking);
+			}
+		});
+		
+		function setTalkingOnRadio(plyId, talking){
+			plyId = parseInt(plyId);
+			if(talking){
+				document.getElementById('player-'+plyId).classList.add("active");
+			} else {
+				document.getElementById('player-'+plyId).classList.remove("active");
+			}
+		}
+		
+		function addToRadio(playerData){
+			let rl=document.getElementById('radio-list');
+			
+			let ids="";
+			if(playerData.identifier != null) ids = playerData.identifier.identifier + " [" + playerData.identifier.agency.short_name + "] ";
+			
+			rl.innerHTML += '<li id="player-'+(playerData.plyId)+'">'+ids+' #'+(playerData.plyId)+'</li>';
+		}
+		
+		function removeFromRadio(plyId){
+			plyId = parseInt(plyId);
+			document.getElementById('player-'+plyId).remove();
+		}
+		
+		function cleanRadio(){
+			document.getElementById('radio-list').innerHTML='';
+			document.getElementById('radio-stuff').style.display='none';
+		}
+		
+		function joinRadio(radioData){
+			console.log(radioData);
+			document.getElementById('radio-list').innerHTML='';
+			for(let k in radioData){
+				if(radioData[k] != null) addToRadio(radioData[k]);
+			}
+			document.getElementById('radio-stuff').style.display='block';
+		}
+		</script>
+</body>
+
+</html>
